@@ -1,28 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { OData } from "@odata/client";
+import CategoryCard from "./CategoryCard";
 
 function ODataTable() {
-  const fetchOData = async () => {
-    try {
-      const response = await fetch(
-        "https://services.odata.org/V4/Northwind/Northwind.svc/Categories"
-      );
-      const data = await response.json();
-      console.log(data.value); // OData results are usually in the "value" field
-    } catch (error) {
-      console.error("Error fetching OData:", error);
-    }
-  };
+  //let category = [];
 
-  fetchOData();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOData = async () => {
+      try {
+        const response = await fetch(
+          "https://services.odata.org/V4/Northwind/Northwind.svc/Categories"
+        );
+        const result = await response.json();
+        setData(result.value);
+      } catch (error) {
+        console.error("Error fetching OData:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOData();
+  }, []);
 
   return (
-    <>
-      <div class="container py-4 px-3 mx-auto">
-        <h1>Hello, Bootstrap and Vite!</h1>
-        <button class="btn btn-primary">Primary button</button>
-      </div>
-    </>
+    console.log("Loading:", loading),
+    console.log(data),
+    (
+      <>
+        <div>
+          <h2>OData Categories</h2>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <ul>
+              {data.map((category) => (
+                <li key={category.CategoryID}>{category.CategoryName}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </>
+    )
   );
 }
 
